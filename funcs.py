@@ -13,13 +13,13 @@ def get_data_from_section_and_ip(section_id, ip):
 
     device = None
     if ip == "all":
-        for x in sec.prefix_rows:
+        for x in sec.get("prefix_rows") or []:
             x_ip = x.get("ip") or None
             if x_ip == ip:
                 device = x
                 break
     else:
-        for x in sec.devices:
+        for x in sec.get("devices") or []:
             x_ip = x.get("ip") or None
             if x_ip == ip:
                 device = x
