@@ -26,7 +26,7 @@ git clone https://github.com/NewDayNaz/SmartSwitchPowerSequencer.git
 2. Install the required dependencies:
 
 ```bash
-TODO:
+pip install -r requirements.txt
 ```
 
 3. TODO: Configure your TP-Link Kasa Smart Switches by following the instructions provided in the `config.py` file.
