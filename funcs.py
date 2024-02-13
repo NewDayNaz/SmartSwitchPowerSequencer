@@ -11,10 +11,10 @@ def get_section_and_device(section_id, ip):
     device = None
     if ip == "all":
         # Look for devices in the prefix_rows
-        device = next((x for x in section.get("prefix_rows", []) if x.get("ip") == ip), None)
+        device = next((x for x in section.get("prefix_rows", []) if x.ip == ip), None)
     else:
         # Look for devices in the devices list
-        device = next((x for x in section.get("devices", []) if x.get("ip") == ip), None)
+        device = next((x for x in section.get("devices", []) if x.ip == ip), None)
 
     return (section, device)
 
@@ -28,13 +28,9 @@ def turn_on(section_id, ip):
             devices = reversed(devices)
 
         for device_info in devices:
-            predelay = device_info.get("predelay", 0)
-            time.sleep(predelay)
-            plug = SmartPlug(device_info.get("ip"))
-            plug.turn_on()
+            device_info.turn_on()
     else:
-        plug = SmartPlug(device.get("ip"))
-        plug.turn_on()
+        device.turn_on()
 
     return False
 def turn_off(section_id, ip_address):
@@ -47,13 +43,9 @@ def turn_off(section_id, ip_address):
             devices = reversed(devices)
 
         for device_info in devices:
-            predelay = device_info.get("predelay", 0)
-            time.sleep(predelay)
-            plug = SmartPlug(device_info.get("ip"))
-            plug.turn_off()
+            device_info.turn_off()
     else:
-        plug = SmartPlug(device.get("ip"))
-        plug.turn_off()
+        device.turn_off()
 
     return False
 
@@ -89,41 +81,42 @@ def get_section_rows_html_arr(section):
     rows_html = []
     alt_row = False
     for row in sec_prefix_rows:
-        r_label = row.get("label")
-        r_ip = row.get("ip")
-        r_show_status = row.get("show_status")
-        r_predelay = row.get("predelay", 0)
+        r_label = row.label
+        r_show_status = row.show_status
+        r_predelay = row.predelay
 
-        ip_label = r_ip if r_ip != "all" else "***.***.***.***"
-        plug = SmartPlug(r_ip) if r_ip != "all" else None
-        status_label = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+        ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
-        input_html = get_input_html_str(sec_id, r_ip)
+        status_label = ""
+        if row.show_status:
+            status_label = row.status()
+
+        input_html = get_input_html_str(sec_id, row.ip)
         row_html = get_table_row_html_str(
             "table-success", 
             ip_label, 
-            r_label, 
+            row.label, 
             status_label, 
             input_html
         )
         rows_html.append(row_html)
 
     for row in sec_devices:
-        r_label = row.get("label")
-        r_ip = row.get("ip")
-        r_show_status = row.get("show_status")
-        r_predelay = row.get("predelay", 0)
+        r_show_status = row.show_status
+        r_predelay = row.predelay
 
-        ip_label = r_ip if r_ip != "all" else "***.***.***.***"
-        plug = SmartPlug(r_ip) if r_ip != "all" else None
-        status_label = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+        ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
-        input_html = get_input_html_str(sec_id, r_ip)
+        status_label = ""
+        if row.show_status:
+            status_label = row.status()
+
+        input_html = get_input_html_str(sec_id, row.ip)
         
         row_html = get_table_row_html_str(
             "table-primary" if not alt_row else "table-secondary", 
             ip_label, 
-            r_label, 
+            row.label, 
             status_label, 
             input_html
         )
