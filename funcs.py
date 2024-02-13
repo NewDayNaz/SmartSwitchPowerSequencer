@@ -49,25 +49,20 @@ def turn_off(section_id, ip_address):
     return False
 
 def get_input_html_str(section_id, ip):
-    return """
-        <form action="/turn_on?section=%s&ip=%s" method="POST">
-            <button class="btn btn-primary spinner-button" type="submit">Turn on</button>
-        </form>
-        <form action="/turn_off?section=%s&ip=%s" method="POST">
-            <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
-        </form>
-    """ % (section_id, ip, section_id, ip)
+    return f"""<form action="/turn_on?section={section_id}&ip={ip}" method="POST">
+<button class="btn btn-primary spinner-button" type="submit">Turn on</button>
+</form>
+<form action="/turn_off?section={section_id}&ip={ip}" method="POST">
+    <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
+</form>"""
     
 def get_table_row_html_str(row_class, ip_label, r_label, status_label, input_html):
     return f"""
         <tr class='{row_class}'>
             <td>{ip_label}</td>
             <td>{r_label} {status_label}</td>
-            <td>
-                {input_html}
-            </td>
-        </tr>
-    """
+            <td>{input_html}</td>
+        </tr>"""
 
 def get_section_rows_html_arr(section):
     sec_id = section.get("id", "none")
@@ -133,7 +128,6 @@ def generate_section_table_html_str(section):
         <div class="col-md-3"></div>
         <div class="col-md-6">
             <h1>{section_name}</h1>
-            
             <table class="table">
             <thead>
                 <tr>
@@ -148,12 +142,10 @@ def generate_section_table_html_str(section):
             </table>
         </div>
         <div class="col-md-3"></div>
-    </div>
-    """
+    </div>"""
 
 def generate_includes_html_str():
-    return """
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    return """<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
         <script type="text/javascript">
@@ -165,8 +157,7 @@ def generate_includes_html_str():
                         $(this).html('<span class="spinner-grow spinner-grow-sm" role="status"></span> loading...');
                     });
                 });
-        </script>
-    """
+        </script>"""
 
 def generate_section_index_html_str(body):
     title = cfg.title
@@ -180,11 +171,8 @@ def generate_section_index_html_str(body):
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             {includes}
         </head>
-        <body>
-            {body}
-        </body>
-        </html>
-    """
+        <body>{body}</body>
+        </html>"""
 
 def get_section_index_html():
     section_html_list = [generate_section_table_html_str(sec) for sec in cfg.sections]
