@@ -3,66 +3,53 @@ import time
 
 import config as cfg
 
-def get_data_from_section_and_ip(section_id, ip):
-    sec = None
-    for x in cfg.sections:
-        x_id = x.get("id") or None
-        if x_id == section_id:
-            sec = x
-            break
+def get_section_and_device(section_id, ip):
+    # Find the section with the given section_id
+    section = next((x for x in cfg.sections if x.get("id") == section_id), None)
 
+    # Find the device with the given IP address
     device = None
     if ip == "all":
-        for x in sec.get("prefix_rows") or []:
-            x_ip = x.get("ip") or None
-            if x_ip == ip:
-                device = x
-                break
+        # Look for devices in the prefix_rows
+        device = next((x for x in section.get("prefix_rows", []) if x.get("ip") == ip), None)
     else:
-        for x in sec.get("devices") or []:
-            x_ip = x.get("ip") or None
-            if x_ip == ip:
-                device = x
-                break
+        # Look for devices in the devices list
+        device = next((x for x in section.get("devices", []) if x.get("ip") == ip), None)
 
-    return (sec, device)
+    return (section, device)
 
 def turn_on(section_id, ip):
-    data = get_data_from_section_and_ip(section_id, ip)
-    section = data[0] or None
-    device = data[1] or None
+    section, device = get_section_and_device(section_id, ip)
 
     if ip == "all":
-        device_list = section.get("devices") or []
-        order = section.get("order_turn_on") or "desc"
+        devices = section.get("devices", [])
+        order = section.get("order_turn_on", "desc")
         if order == "asc":
-            device_list = reversed(device_list)
+            devices = reversed(devices)
 
-        for x in device_list:
-            x_predelay = x.get("predelay") or 0
-            time.sleep(x_predelay)
-            plug = SmartPlug(x.get("ip"))
+        for device_info in devices:
+            predelay = device_info.get("predelay", 0)
+            time.sleep(predelay)
+            plug = SmartPlug(device_info.get("ip"))
             plug.turn_on()
     else:
         plug = SmartPlug(device.get("ip"))
         plug.turn_on()
 
     return False
-def turn_off(section_id, ip):
-    data = get_data_from_section_and_ip(section_id, ip)
-    section = data[0] or None
-    device = data[1] or None
+def turn_off(section_id, ip_address):
+    section, device = get_section_and_device(section_id, ip_address)
 
-    if ip == "all":
-        device_list = section.get("devices") or []
-        order = section.get("order_turn_off") or "desc"
+    if ip_address == "all":
+        devices = section.get("devices", [])
+        order = section.get("order_turn_off", "desc")
         if order == "asc":
-            device_list = reversed(device_list)
+            devices = reversed(devices)
 
-        for x in device_list:
-            x_predelay = x.get("predelay") or 0
-            time.sleep(x_predelay)
-            plug = SmartPlug(x.get("ip"))
+        for device_info in devices:
+            predelay = device_info.get("predelay", 0)
+            time.sleep(predelay)
+            plug = SmartPlug(device_info.get("ip"))
             plug.turn_off()
     else:
         plug = SmartPlug(device.get("ip"))
@@ -70,146 +57,110 @@ def turn_off(section_id, ip):
 
     return False
 
-def get_section_index_html():
-    sections_html = []
-    for sec in cfg.sections:
-        sec_id = sec.get("id") or "none"
-        sec_name = sec.get("name") or None
-        sec_prefix_rows = sec.get("prefix_rows") or []
-        sec_devices = sec.get("devices") or []
-        sec_order_turn_on = sec.get("order_turn_on") or "desc"
-        sec_order_turn_off = sec.get("order_turn_off") or "desc"
+def get_input_html_str(section_id, ip):
+    return """
+        <form action="/turn_on?section=%s&ip=%s" method="POST">
+            <button class="btn btn-primary spinner-button" type="submit">Turn on</button>
+        </form>
+        <form action="/turn_off?section=%s&ip=%s" method="POST">
+            <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
+        </form>
+    """ % (section_id, ip, section_id, ip)
+    
+def get_table_row_html_str(row_class, ip_label, r_label, status_label, input_html):
+    return f"""
+        <tr class='{row_class}'>
+            <td>{ip_label}</td>
+            <td>{r_label} {status_label}</td>
+            <td>
+                {input_html}
+            </td>
+        </tr>
+    """
+
+def get_section_rows_html_arr(section):
+    sec_id = section.get("id", "none")
+    sec_name = section.get("name")
+    sec_prefix_rows = section.get("prefix_rows", [])
+    sec_devices = section.get("devices", [])
+    sec_order_turn_on = section.get("order_turn_on", "desc")
+    sec_order_turn_off = section.get("order_turn_off", "desc")
+
+    rows_html = []
+    alt_row = False
+    for row in sec_prefix_rows:
+        r_label = row.get("label")
+        r_ip = row.get("ip")
+        r_show_status = row.get("show_status")
+        r_predelay = row.get("predelay", 0)
+
+        ip_label = r_ip if r_ip != "all" else "***.***.***.***"
+        plug = SmartPlug(r_ip) if r_ip != "all" else None
+        status_label = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+
+        input_html = get_input_html_str(sec_id, r_ip)
+        row_html = get_table_row_html_str(
+            "table-success", 
+            ip_label, 
+            r_label, 
+            status_label, 
+            input_html
+        )
+        rows_html.append(row_html)
+
+    for row in sec_devices:
+        r_label = row.get("label")
+        r_ip = row.get("ip")
+        r_show_status = row.get("show_status")
+        r_predelay = row.get("predelay", 0)
+
+        ip_label = r_ip if r_ip != "all" else "***.***.***.***"
+        plug = SmartPlug(r_ip) if r_ip != "all" else None
+        status_label = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+
+        input_html = get_input_html_str(sec_id, r_ip)
         
-        sec_rows = []
+        row_html = get_table_row_html_str(
+            "table-primary" if not alt_row else "table-secondary", 
+            ip_label, 
+            r_label, 
+            status_label, 
+            input_html
+        )
+        rows_html.append(row_html)
+        alt_row = not alt_row
+    
+    return rows_html
 
-        altRow = False
+def generate_section_table_html_str(section):
+    section_name = section.get("name") or None
 
-        for row in sec_prefix_rows:
-            r_label = row.get("label") or None
-            r_ip = row.get("ip") or None
-            r_show_status = row.get("show_status") or None
-            r_predelay = row.get("predelay") or 0
-
-            plug = None
-            status_label = ""
-
-            ip_label = r_ip
-
-            if ip_label == "all":
-                ip_label = "***.***.***.***"
-            else:
-                plug = SmartPlug(r_ip)
-                try:
-                    status_label = "(%s)" % plug.state
-                except:
-                    status_label = "UNAVAILABLE (OFFLINE)"
-
-            input_html = """
-                    <form action="/turn_on?section=%s&ip=%s" method="POST">
-                        <button class="btn btn-primary spinner-button" type="submit">Turn on</button>
-                    </form>
-                    <form action="/turn_off?section=%s&ip=%s" method="POST">
-                        <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
-                    </form>
-                """ % (sec_id, r_ip, sec_id, r_ip)
-
-            row_html = """
-            <tr class='table-success'>
-                <td>%s</td>
-                <td>%s %s</td>
-                <td>
-                    %s
-                </td>
-            </tr>
-            """ % (ip_label, r_label, status_label, input_html)
-
-            sec_rows.append(row_html)
-
-        for row in sec_devices:
-            r_label = row.get("label") or None
-            r_ip = row.get("ip") or None
-            r_show_status = row.get("show_status") or None
-            r_predelay = row.get("predelay") or None
-
-            plug = None
-            status_label = ""
-
-            ip_label = r_ip
-
-            if ip_label == "all":
-                ip_label = "***.***.***.***"
-            else:
-                plug = SmartPlug(r_ip)
-                try:
-                    status_label = "(%s)" % plug.state
-                except:
-                    status_label = "UNAVAILABLE (OFFLINE)"
-
-            input_html = """
-                <form action="/turn_on?section=%s&ip=%s" method="POST">
-                    <button class="btn btn-primary spinner-button" type="submit">Turn on</button>
-                </form>
-                <form action="/turn_off?section=%s&ip=%s" method="POST">
-                    <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
-                </form>
-            """ % (sec_id, r_ip, sec_id, r_ip)
-
-            plug = None
+    rows_html = get_section_rows_html_arr(section)
+    return f"""
+        <div class="row mb-3">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h1>{section_name}</h1>
             
-            row_html = ""
-            if not altRow:
-                row_html = """
-                    <tr class='table-primary'>
-                        <td>%s</td>
-                        <td>%s %s</td>
-                        <td>
-                            %s
-                        </td>
-                    </tr>
-                """ % (ip_label, r_label, status_label, input_html)
-            else:
-                row_html = """
-                    <tr class='table-secondary'>
-                        <td>%s</td>
-                        <td>%s %s</td>
-                        <td>
-                            %s
-                        </td>
-                    </tr>
-                """ % (ip_label, r_label, status_label, input_html)
+            <table class="table">
+            <thead>
+                <tr>
+                    <th>IP</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+            </table>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    """
 
-            altRow = not altRow
-
-            sec_rows.append(row_html)
-
-        section_table = """
-            <div class="row mb-3">
-                <div class="col-md-3"></div>
-                <div class="col-md-6">
-                    <h1>%s</h1>
-                    
-                    <table class="table">
-                    <thead>
-                        <tr>
-                            <th>IP</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        %s
-                    </tbody>
-                    </table>
-                </div>
-                <div class="col-md-3"></div>
-            </div>
-        """ % (sec_name, " ".join(sec_rows))
-
-        sections_html.append(section_table)
-
-    sections_html = " ".join(sections_html)
-
-    return_html = """
+def generate_section_index_html_str(body):
+    return """
         <html>
         <head>
             <title>Power Dashboard</title>
@@ -233,5 +184,9 @@ def get_section_index_html():
             %s
         </body>
         </html>
-    """ % (sections_html)
-    return return_html
+    """ % (body)
+
+def get_section_index_html():
+    section_html_list = [generate_section_table_html_str(sec) for sec in cfg.sections]
+    sections_html = " ".join(section_html_list)
+    return generate_section_index_html_str(sections_html)

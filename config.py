@@ -1,8 +1,3 @@
-device_list = ["10.10.10.247", "10.10.10.249", "10.10.10.248", "10.10.10.246", "10.10.10.226"]
-# Soundboard, Stagebox, Speaker L, Speaker R, TV
-sound_device_list = ["10.10.10.254", "10.10.10.251", "10.10.10.252", "10.10.10.253"]
-# sound_device_list = []
-
 sections = [
     {
         "id": "sound",
