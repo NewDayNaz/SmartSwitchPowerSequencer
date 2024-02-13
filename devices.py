@@ -24,11 +24,11 @@ class KasaSmartSwitch(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=False):
         super().__init__(label, ip, predelay, show_status)
 
-def turn_off(self):
-    time.sleep(self.predelay)
-    with SmartPlug(self.ip) as plug:
-        plug.turn_off()
-    return True
+    def turn_off(self):
+        time.sleep(self.predelay)
+        with SmartPlug(self.ip) as plug:
+            plug.turn_off()
+        return True
 
     def turn_on(self):
         time.sleep(self.predelay)
