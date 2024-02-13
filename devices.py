@@ -9,13 +9,16 @@ class GenericDevice:
         self.predelay = predelay
         self.show_status = show_status
 
-    def turn_off(self):
+    async def update(self):
         return False
 
-    def turn_on(self):
+    async def turn_off(self):
         return False
 
-    def status(self):
+    async def turn_on(self):
+        return False
+
+    async def status(self):
         return ""
 
     def __str__(self):
@@ -24,30 +27,32 @@ class GenericDevice:
 class KasaSmartSwitch(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=False):
         super().__init__(label, ip, predelay, show_status)
-        if label is None:
+
+    async def update(self):
+        if self.label is None:
             plug = SmartPlug(self.ip)
-            asyncio.run(plug.update())
+            await plug.update()
             self.label = plug.alias
             plug = None
+        return True
 
-    def turn_off(self):
+    async def turn_off(self):
         time.sleep(self.predelay)
         plug = SmartPlug(self.ip)
-        asyncio.run(plug.turn_off())
-        plug.turn_off()
+        await plug.turn_off()
         plug = None
         return True
 
-    def turn_on(self):
+    async def turn_on(self):
         time.sleep(self.predelay)
         plug = SmartPlug(self.ip)
-        asyncio.run(plug.turn_on())
+        await plug.turn_on()
         plug = None
         return True
 
-    def status(self):
+    async def status(self):
         plug = SmartPlug(self.ip) if self.ip != "all" else None
-        asyncio.run(plug.update())
+        await plug.update()
         status_str = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
         plug = None
         return status_str

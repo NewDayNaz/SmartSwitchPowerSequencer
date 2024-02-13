@@ -17,7 +17,7 @@ def get_section_and_device(section_id, ip):
 
     return (section, device)
 
-def turn_on(section_id, ip):
+async def turn_on(section_id, ip):
     section, device = get_section_and_device(section_id, ip)
 
     if ip == "all":
@@ -27,12 +27,12 @@ def turn_on(section_id, ip):
             devices = reversed(devices)
 
         for device_info in devices:
-            device_info.turn_on()
+            await device_info.turn_on()
     else:
-        device.turn_on()
+        await device.turn_on()
 
     return False
-def turn_off(section_id, ip_address):
+async def turn_off(section_id, ip_address):
     section, device = get_section_and_device(section_id, ip_address)
 
     if ip_address == "all":
@@ -42,9 +42,9 @@ def turn_off(section_id, ip_address):
             devices = reversed(devices)
 
         for device_info in devices:
-            device_info.turn_off()
+            await device_info.turn_off()
     else:
-        device.turn_off()
+        await device.turn_off()
 
     return False
 
@@ -69,7 +69,7 @@ def get_table_row_html_str(row_class, ip_label, r_label, status_label, input_htm
         </tr>
     """
 
-def get_section_rows_html_arr(section):
+async def get_section_rows_html_arr(section):
     sec_id = section.get("id", "none")
     sec_name = section.get("name")
     sec_prefix_devices = section.get("prefix_devices", [])
@@ -80,6 +80,7 @@ def get_section_rows_html_arr(section):
     rows_html = []
     alt_row = False
     for row in sec_prefix_devices:
+        await row.update()
         r_label = row.label
         r_show_status = row.show_status
         r_predelay = row.predelay
@@ -88,7 +89,7 @@ def get_section_rows_html_arr(section):
 
         status_label = ""
         if row.show_status:
-            status_label = row.status()
+            status_label = await row.status()
 
         input_html = get_input_html_str(sec_id, row.ip)
         row_html = get_table_row_html_str(
@@ -101,6 +102,7 @@ def get_section_rows_html_arr(section):
         rows_html.append(row_html)
 
     for row in sec_devices:
+        await row.update()
         r_show_status = row.show_status
         r_predelay = row.predelay
 
@@ -108,7 +110,7 @@ def get_section_rows_html_arr(section):
 
         status_label = ""
         if row.show_status:
-            status_label = row.status()
+            status_label = await row.status()
 
         input_html = get_input_html_str(sec_id, row.ip)
         
@@ -124,10 +126,10 @@ def get_section_rows_html_arr(section):
     
     return rows_html
 
-def generate_section_table_html_str(section):
+async def generate_section_table_html_str(section):
     section_name = section.get("name") or None
 
-    rows_html = get_section_rows_html_arr(section)
+    rows_html = await get_section_rows_html_arr(section)
     return f"""
         <div class="row mb-3">
         <div class="col-md-3"></div>
@@ -186,7 +188,7 @@ def generate_section_index_html_str(body):
         </html>
     """
 
-def get_section_index_html():
-    section_html_list = [generate_section_table_html_str(sec) for sec in cfg.sections]
+async def get_section_index_html():
+    section_html_list = [await generate_section_table_html_str(sec) for sec in cfg.sections]
     sections_html = " ".join(section_html_list)
     return generate_section_index_html_str(sections_html)
