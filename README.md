@@ -34,16 +34,18 @@ git clone https://github.com/NewDayNaz/SmartSwitchPowerSequencer.git
 pip install -r requirements.txt
 ```
 
-3. TODO: Configure your TP-Link Kasa Smart Switches by following the instructions provided in the `config.py` file.
+3. Ensure your smart switches are assigned static ip addresses.
 
-4. Run the Flask web server:
+4. Configure your smart switches by modifying the `config.py` file.
+
+5. Run the Flask web server:
 
 ```bash
 set FLASK_APP=server.py
 python -m flask run --host=0.0.0.0
 ```
 
-5. Access the dashboard by navigating to `http://localhost:5000` in your web browser.
+6. Access the dashboard by navigating to `http://localhost:5000` in your web browser.
 
 ## Usage
 
