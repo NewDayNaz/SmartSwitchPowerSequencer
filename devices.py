@@ -15,7 +15,7 @@ class GenericDevice:
         return False
 
     def status(self):
-        return "Not implemented"
+        return ""
 
     def __str__(self):
         return f"Device with IP: {self.ip}, label: {self.label}, predelay: {self.predelay}, show_status: {self.show_status}"
@@ -34,7 +34,7 @@ class KasaSmartSwitch(GenericDevice):
         time.sleep(self.predelay)
         with SmartPlug(self.ip) as plug:
             plug.turn_on()
-        Return True
+        return True
 
     def status(self):
         plug = SmartPlug(self.ip) if self.ip != "all" else None
