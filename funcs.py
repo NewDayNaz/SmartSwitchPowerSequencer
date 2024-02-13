@@ -151,32 +151,40 @@ def generate_section_table_html_str(section):
     </div>
     """
 
-def generate_section_index_html_str(body):
+def generate_includes_html_str():
     return """
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+                $(document).ready(function() {
+                    $(".spinner-button").click(function() {
+                        // disable button
+                        $(this).submit();
+                        // add spinner to button
+                        $(this).html('<span class="spinner-grow spinner-grow-sm" role="status"></span> loading...');
+                    });
+                });
+        </script>
+    """
+
+def generate_section_index_html_str(body):
+    title = cfg.title
+    includes = generate_includes_html_str()
+    
+    return f"""
         <html>
         <head>
-            <title>Power Dashboard</title>
+            <title>{title}</title>
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-            <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-            <script type="text/javascript">
-                    $(document).ready(function() {
-                        $(".spinner-button").click(function() {
-                            // disable button
-                            $(this).submit();
-                            // add spinner to button
-                            $(this).html('<span class="spinner-grow spinner-grow-sm" role="status"></span> loading...');
-                        });
-                    });
-            </script>
+            {includes}
         </head>
         <body>
-            %s
+            {body}
         </body>
         </html>
-    """ % (body)
+    """
 
 def get_section_index_html():
     section_html_list = [generate_section_table_html_str(sec) for sec in cfg.sections]

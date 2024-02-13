@@ -1,5 +1,6 @@
 from devices import *
-    
+
+title = "Power Dashboard"
 sections = [
     {
         "id": "sound",
