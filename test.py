@@ -1,9 +1,6 @@
-import asyncio
-from kasa import SmartPlug
-import funcs as funcs
+from pyHS100 import Discover, SmartPlug
 
-# plug = SmartPlug("10.10.10.247")
-# asyncio.run(plug.update())
-# print(plug.alias)
+import funcs as funcs
+import config as cfg
 
 print(funcs.get_section_index_html())

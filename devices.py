@@ -1,5 +1,4 @@
-import asyncio
-from kasa import SmartPlug
+from pyHS100 import Discover, SmartPlug
 import time
 
 class GenericDevice:
@@ -24,30 +23,21 @@ class GenericDevice:
 class KasaSmartSwitch(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=False):
         super().__init__(label, ip, predelay, show_status)
-        if label is None:
-            plug = SmartPlug(self.ip)
-            asyncio.run(plug.update())
-            self.label = plug.alias
-            plug = None
 
     def turn_off(self):
         time.sleep(self.predelay)
-        plug = SmartPlug(self.ip)
-        asyncio.run(plug.turn_off())
-        plug.turn_off()
-        plug = None
+        with SmartPlug(self.ip) as plug:
+            plug.turn_off()
         return True
 
     def turn_on(self):
         time.sleep(self.predelay)
-        plug = SmartPlug(self.ip)
-        asyncio.run(plug.turn_on())
-        plug = None
+        with SmartPlug(self.ip) as plug:
+            plug.turn_on()
         return True
 
     def status(self):
         plug = SmartPlug(self.ip) if self.ip != "all" else None
-        asyncio.run(plug.update())
         status_str = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
         plug = None
         return status_str
