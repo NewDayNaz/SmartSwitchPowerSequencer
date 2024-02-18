@@ -1,6 +1,11 @@
+from __future__ import with_statement
+from mako.template import Template
 import time
+import os
 
 import config as cfg
+
+tmpl_path = os.path.abspath(__file__) + r"\templates"
 
 def get_section_and_device(section_id, ip):
     # Find the section with the given section_id
@@ -49,20 +54,12 @@ def turn_off(section_id, ip_address):
     return False
 
 def get_input_html_str(section_id, ip):
-    return f"""<form action="/turn_on?section={section_id}&ip={ip}" method="POST">
-<button class="btn btn-primary spinner-button" type="submit">Turn on</button>
-</form>
-<form action="/turn_off?section={section_id}&ip={ip}" method="POST">
-    <button class="btn btn-warning spinner-button" type="submit">Turn off</button>
-</form>"""
+    with open(tmpl_path + r"\input_form.html", 'r') as fp:
+        return Template(fp.read()).render(section_id=section_id,ip=ip)
     
 def get_table_row_html_str(row_class, ip_label, r_label, status_label, input_html):
-    return f"""
-        <tr class='{row_class}'>
-            <td>{ip_label}</td>
-            <td>{r_label} {status_label}</td>
-            <td>{input_html}</td>
-        </tr>"""
+    with open(tmpl_path + r"\row.html", 'r') as fp:
+        return Template(fp.read()).render(row_class=row_class,ip_label=ip_label,r_label=r_label,status_label=status_label,input_html=input_html)
 
 def get_section_rows_html_arr(section):
     sec_id = section.get("id", "none")
@@ -122,57 +119,21 @@ def get_section_rows_html_arr(section):
 def generate_section_table_html_str(section):
     section_name = section.get("name") or None
 
-    rows_html = get_section_rows_html_arr(section)
-    return f"""
-        <div class="row mb-3">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-            <h1>{section_name}</h1>
-            <table class="table">
-            <thead>
-                <tr>
-                    <th>IP</th>
-                    <th>Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows_html}
-            </tbody>
-            </table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>"""
+    rows_arr = get_section_rows_html_arr(section)
+    rows_html = "".join(rows_arr)
+    with open(tmpl_path + r"\table.html", 'r') as fp:
+        return Template(fp.read()).render(section_name=section_name,rows_html=rows_html)
 
 def generate_includes_html_str():
-    return """<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-        <script type="text/javascript">
-                $(document).ready(function() {
-                    $(".spinner-button").click(function() {
-                        // disable button
-                        $(this).submit();
-                        // add spinner to button
-                        $(this).html('<span class="spinner-grow spinner-grow-sm" role="status"></span> loading...');
-                    });
-                });
-        </script>"""
+    with open(tmpl_path + r"\includes.html", 'r') as fp:
+        return Template(fp.read()).render()
 
 def generate_section_index_html_str(body):
     title = cfg.title
     includes = generate_includes_html_str()
-    
-    return f"""
-        <html>
-        <head>
-            <title>{title}</title>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            {includes}
-        </head>
-        <body>{body}</body>
-        </html>"""
+
+    with open(tmpl_path + r"\base.html", 'r') as fp:
+        return Template(fp.read()).render(title=title,includes=includes,body=body)
 
 def get_section_index_html():
     section_html_list = [generate_section_table_html_str(sec) for sec in cfg.sections]
