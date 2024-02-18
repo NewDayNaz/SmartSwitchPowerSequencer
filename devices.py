@@ -26,22 +26,32 @@ class KasaSmartSwitch(GenericDevice):
         self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
             self.label = self.plug.alias
+        self.plug = None
 
     def turn_off(self):
         time.sleep(self.predelay)
+        if self.plug is None:
+            self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
             self.plug.turn_off()
+        self.plug = None
         return True
 
     def turn_on(self):
         time.sleep(self.predelay)
+        if self.plug is None:
+            self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
             self.plug.turn_on()
+        self.plug = None
         return True
 
     def status(self):
+        if self.plug is None:
+            self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
             status_str = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+        self.plug = None
         return status_str
     
     def __del__(self):
