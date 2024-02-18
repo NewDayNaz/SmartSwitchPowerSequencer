@@ -19,6 +19,8 @@ I am using the classic Kasa HS100 smart plugs (sadly now EoL) which are actually
 - Python 3.x
 - Flask
 - pyHS100
+- mako
+- requests
 
 ## Installation
 

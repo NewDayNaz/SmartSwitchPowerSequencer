@@ -1,7 +1,4 @@
-from flask import Flask, escape, request, redirect, url_for
-from pyHS100 import Discover, SmartPlug
-import requests
-import time
+from flask import Flask, request, redirect, url_for
 
 import funcs as funcs
 import config as cfg
