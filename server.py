@@ -1,4 +1,7 @@
-from flask import Flask, request, Response, redirect
+from flask import Flask, escape, request, redirect, url_for
+from pyHS100 import Discover, SmartPlug
+import requests
+import time
 
 import funcs as funcs
 import config as cfg
@@ -6,19 +9,18 @@ import config as cfg
 app = Flask(__name__)
 
 @app.route('/')
-async def home():
-    data = await funcs.get_section_index_html()
-    return data
+def home():
+    return funcs.get_section_index_html()
 
 @app.route('/turn_off', methods=['POST'])
-async def turn_off():
+def turn_off():
     section = request.args.get("section", "none")
     ip = request.args.get("ip", "all")
     funcs.turn_off(section, ip)
     return redirect('/')
 
 @app.route('/turn_on', methods=['POST'])
-async def turn_on():
+def turn_on():
     section = request.args.get("section", "none")
     ip = request.args.get("ip", "all")
     funcs.turn_on(section, ip)
