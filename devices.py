@@ -2,7 +2,7 @@ from pyHS100 import Discover, SmartPlug
 import time
 
 class GenericDevice:
-    def __init__(self, label=None, ip=None, predelay=0, show_status=False):
+    def __init__(self, label=None, ip=None, predelay=0, show_status=True):
         self.label = label
         self.ip = ip
         self.predelay = predelay
@@ -21,7 +21,7 @@ class GenericDevice:
         return f"Device with IP: {self.ip}, label: {self.label}, predelay: {self.predelay}, show_status: {self.show_status}"
 
 class KasaSmartSwitch(GenericDevice):
-    def __init__(self, label=None, ip=None, predelay=0, show_status=False):
+    def __init__(self, label=None, ip=None, predelay=0, show_status=True):
         super().__init__(label, ip, predelay, show_status)
 
     def turn_off(self):

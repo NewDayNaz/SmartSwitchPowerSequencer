@@ -5,7 +5,7 @@ import os
 
 import config as cfg
 
-tmpl_path = os.path.abspath(__file__) + r"\templates"
+tmpl_path = os.path.dirname(os.path.realpath(__file__)) + r"\templates"
 
 def get_section_and_device(section_id, ip):
     # Find the section with the given section_id
