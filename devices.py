@@ -50,7 +50,7 @@ class KasaSmartSwitch(GenericDevice):
         if self.plug is None:
             self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
-            status_str = "(%s)" % plug.state if plug else "UNAVAILABLE (OFFLINE)"
+            status_str = "(%s)" % self.plug.state if self.plug else "UNAVAILABLE (OFFLINE)"
         self.plug = None
         return status_str
     
