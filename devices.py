@@ -1,6 +1,7 @@
 from pyHS100 import Discover, SmartPlug
 import time
 
+
 class GenericDevice:
     def __init__(self, label=None, ip=None, predelay=0, show_status=True):
         self.label = label
@@ -19,6 +20,7 @@ class GenericDevice:
 
     def __str__(self):
         return f"Device with IP: {self.ip}, label: {self.label}, predelay: {self.predelay}, show_status: {self.show_status}"
+
 
 class KasaSmartSwitch(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=True):
@@ -50,9 +52,11 @@ class KasaSmartSwitch(GenericDevice):
         if self.plug is None:
             self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
-            status_str = "(%s)" % self.plug.state if self.plug else "UNAVAILABLE (OFFLINE)"
+            status_str = (
+                "(%s)" % self.plug.state if self.plug else "UNAVAILABLE (OFFLINE)"
+            )
         self.plug = None
         return status_str
-    
+
     def __del__(self):
         self.plug = None
