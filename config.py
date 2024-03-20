@@ -1,4 +1,4 @@
-from devices import *
+from devices import GenericDevice, KasaSmartSwitch
 
 title = "Power Dashboard"
 sections = [

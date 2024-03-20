@@ -1,4 +1,4 @@
-from pyHS100 import Discover, SmartPlug
+from pyHS100 import SmartPlug
 import time
 
 

@@ -1,6 +1,5 @@
 from __future__ import with_statement
 from mako.template import Template
-import time
 import os
 
 import config as cfg
@@ -78,19 +77,12 @@ def get_table_row_html_str(row_class, ip_label, r_label, status_label, input_htm
 
 def get_section_rows_html_arr(section):
     sec_id = section.get("id", "none")
-    sec_name = section.get("name")
     sec_prefix_devices = section.get("prefix_devices", [])
     sec_devices = section.get("devices", [])
-    sec_order_turn_on = section.get("order_turn_on", "desc")
-    sec_order_turn_off = section.get("order_turn_off", "desc")
 
     rows_html = []
     alt_row = False
     for row in sec_prefix_devices:
-        r_label = row.label
-        r_show_status = row.show_status
-        r_predelay = row.predelay
-
         ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
         status_label = ""
@@ -99,18 +91,11 @@ def get_section_rows_html_arr(section):
 
         input_html = get_input_html_str(sec_id, row.ip)
         row_html = get_table_row_html_str(
-            "table-success", 
-            ip_label, 
-            row.label, 
-            status_label, 
-            input_html
+            "table-success", ip_label, row.label, status_label, input_html
         )
         rows_html.append(row_html)
 
     for row in sec_devices:
-        r_show_status = row.show_status
-        r_predelay = row.predelay
-
         ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
         status_label = ""
