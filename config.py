@@ -1,4 +1,4 @@
-from devices import *
+from devices import GenericDevice, KasaSmartSwitch
 
 title = "Power Dashboard"
 sections = [
@@ -27,7 +27,7 @@ sections = [
             KasaSmartSwitch(ip="10.10.10.251", predelay=15),
             KasaSmartSwitch(ip="10.10.10.252", predelay=5),
             KasaSmartSwitch(ip="10.10.10.253", predelay=5),
-        ]
+        ],
     },
     {
         "id": "lighting",
@@ -43,6 +43,6 @@ sections = [
             KasaSmartSwitch(ip="10.10.10.248", predelay=1),
             KasaSmartSwitch(ip="10.10.10.246", predelay=1),
             KasaSmartSwitch(ip="10.10.10.226", predelay=1),
-        ]
+        ],
     },
 ]
