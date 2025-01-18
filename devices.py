@@ -23,6 +23,32 @@ class GenericDevice:
     def __str__(self):
         return f"Device with IP: {self.ip}, label: {self.label}, predelay: {self.predelay}, show_status: {self.show_status}"
 
+class ESPHomeButton(GenericDevice):
+    def __init__(self, label=None, ip=None, predelay=0, show_status=True, internal_id=""):
+        super().__init__(label, ip, predelay, show_status, internal_id)
+
+    def turn_off(self):
+        try:
+            resp = requests.get(f"http://{self.ip}/button/{self.internal_id}/press")
+            return (resp.status_code == 200)
+        except:
+            return False
+
+    def turn_on(self):
+        try:
+            resp = requests.get(f"http://{self.ip}/button/{self.internal_id}/press")
+            return (resp.status_code == 200)
+        except:
+            return False
+
+    def status(self):
+        try:
+            resp = requests.get(f"http://{self.ip}/", timeout=3)
+            status_str = "(%s)" % "UNKNOWN (ONLINE)" if (resp.status_code == 200) else "UNAVAILABLE (ERROR)"
+            return status_str
+        except:
+            return "UNAVAILABLE (OFFLINE)"
+
 class KasaSmartSwitch(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=True):
         super().__init__(label, ip, predelay, show_status)
