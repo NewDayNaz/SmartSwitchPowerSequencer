@@ -93,7 +93,7 @@ def get_section_rows_html_arr(section):
         r_label = row.label
         r_show_status = row.show_status
         r_predelay = row.predelay
-        r_toggle = row.toggle
+        r_is_toggle = row.is_toggle
 
         ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
@@ -101,7 +101,7 @@ def get_section_rows_html_arr(section):
         if row.show_status:
             status_label = row.status()
 
-        input_html =  get_input_toggle_html_str(sec_id, row.ip) if row.toggle else get_input_html_str(sec_id, row.ip)
+        input_html =  get_input_toggle_html_str(sec_id, row.ip) if row.is_toggle else get_input_html_str(sec_id, row.ip)
         row_html = get_table_row_html_str(
             "table-success", 
             ip_label, 
@@ -114,7 +114,7 @@ def get_section_rows_html_arr(section):
     for row in sec_devices:
         r_show_status = row.show_status
         r_predelay = row.predelay
-        r_toggle = row.toggle
+        r_is_toggle = row.is_toggle
 
         ip_label = row.ip if row.ip != "all" else "***.***.***.***"
 
@@ -122,7 +122,7 @@ def get_section_rows_html_arr(section):
         if row.show_status:
             status_label = row.status()
 
-        input_html =  get_input_toggle_html_str(sec_id, row.ip) if row.toggle else get_input_html_str(sec_id, row.ip)
+        input_html =  get_input_toggle_html_str(sec_id, row.ip) if row.is_toggle else get_input_html_str(sec_id, row.ip)
         
         row_html = get_table_row_html_str(
             "table-primary" if not alt_row else "table-secondary", 

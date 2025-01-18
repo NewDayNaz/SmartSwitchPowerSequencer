@@ -9,7 +9,7 @@ class GenericDevice:
         self.ip = ip
         self.predelay = predelay
         self.show_status = show_status
-        self.toggle = False
+        self.is_toggle = False
 
     def turn_off(self):
         return False
@@ -31,7 +31,7 @@ class ESPHomeButton(GenericDevice):
         super().__init__(label, ip, predelay, show_status, internal_id)
         self.root_url = f"http://{ip}/"
         self.button_url = f"http://{ip}/button/{internal_id}/press"
-        self.toggle = True
+        self.is_toggle = True
 
     def toggle(self):
         try:
