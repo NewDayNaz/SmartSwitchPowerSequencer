@@ -2,7 +2,6 @@ from pyHS100 import Discover, SmartPlug
 import requests
 import time
 
-
 class GenericDevice:
     def __init__(self, label=None, ip=None, predelay=0, show_status=True, internal_id=""):
         self.internal_id = ""
@@ -10,11 +9,15 @@ class GenericDevice:
         self.ip = ip
         self.predelay = predelay
         self.show_status = show_status
+        self.toggle = False
 
     def turn_off(self):
         return False
 
     def turn_on(self):
+        return False
+    
+    def toggle(self):
         return False
 
     def status(self):
@@ -26,24 +29,20 @@ class GenericDevice:
 class ESPHomeButton(GenericDevice):
     def __init__(self, label=None, ip=None, predelay=0, show_status=True, internal_id=""):
         super().__init__(label, ip, predelay, show_status, internal_id)
+        self.root_url = f"http://{ip}/"
+        self.button_url = f"http://{ip}/button/{internal_id}/press"
+        self.toggle = True
 
-    def turn_off(self):
+    def toggle(self):
         try:
-            resp = requests.get(f"http://{self.ip}/button/{self.internal_id}/press")
-            return (resp.status_code == 200)
-        except:
-            return False
-
-    def turn_on(self):
-        try:
-            resp = requests.get(f"http://{self.ip}/button/{self.internal_id}/press")
+            resp = requests.get(self.button_url)
             return (resp.status_code == 200)
         except:
             return False
 
     def status(self):
         try:
-            resp = requests.get(f"http://{self.ip}/", timeout=3)
+            resp = requests.get(self.root_url, timeout=3)
             status_str = "(%s)" % "UNKNOWN (ONLINE)" if (resp.status_code == 200) else "UNAVAILABLE (ERROR)"
             return status_str
         except:
@@ -79,11 +78,9 @@ class KasaSmartSwitch(GenericDevice):
         if self.plug is None:
             self.plug = SmartPlug(self.ip) if self.ip != "all" else None
         if self.plug is not None:
-            status_str = (
-                "(%s)" % self.plug.state if self.plug else "UNAVAILABLE (OFFLINE)"
-            )
+            status_str = "(%s)" % self.plug.state if self.plug else "UNAVAILABLE (OFFLINE)"
         self.plug = None
         return status_str
-
+    
     def __del__(self):
         self.plug = None
