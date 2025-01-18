@@ -3,6 +3,18 @@ from devices import *
 title = "Power Dashboard"
 sections = [
     {
+        "id": "display",
+        "name": "Display Dashboard",
+        "prefix_devices": [
+            GenericDevice(label="Display system", ip="all", show_status=True),
+        ],
+        "order_turn_on": "desc",
+        "order_turn_off": "asc",
+        "devices": [
+            ESPHomeButton(ip="10.10.10.199", label="Projector", internal_id="projector_power_button")
+        ]
+    },
+    {
         "id": "sound",
         "name": "Sound System Dashboard",
         "prefix_devices": [
